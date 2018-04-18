@@ -1,0 +1,71 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+fastlane_version "2.59.0"
+
+default_platform(:android)
+
+platform :android do
+ desc "Build on Crashlytics"
+  lane :build do
+    changelog = prompt(
+      text: "Changelog: ",
+      multi_line_end_keyword: "END",
+    )
+    crashlytics(
+      api_token: "#{ENV["CRASHLYTICS_TOKEN"]}",
+      build_secret: "#{ENV["CRASHLYTICS_SECRET"]}",
+      emails: "#{ENV["TESTERS_ANDROID"]}",
+      notifications: true,
+      notes: changelog
+    )
+  end
+
+  desc "Increment build number"
+  lane :incrementBuild do
+    ensure_git_status_clean
+    increment_version_code
+  end
+
+  desc "Push git tag"
+  lane :pushTag do
+    path = '../app/build.gradle'
+    re = /versionCode\s+(\d+)/ 
+
+    s = File.read(path)
+    versionCode = s[re, 1].to_i
+    commit_android_version_bump
+    add_git_tag(
+      build_number:  versionCode
+    )
+    push_to_git_remote
+  end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+    incrementBuild
+    gradle(task: "assembleRelease")
+    build
+    pushTag
+    notification(
+      title: "Finished Building",
+      message: "Uploading MyBodyCoach to Crashlytics...",
+    )
+  
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
+    gradle(task: "assembleRelease")
+    upload_to_play_store
+  end
+end

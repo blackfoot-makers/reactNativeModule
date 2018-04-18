@@ -1,0 +1,18 @@
+.container {
+  flex: 1;
+  background-color: '#fff';
+  align-items: 'center';
+  justify-content: 'center';
+  margin: 20px;
+}
+
+.textInput {
+  height: 100px;
+  width: 120px;
+}
+
+.containerDim {
+  width: calc(100% - 40px);
+  height: 500px;
+  overflow-y: scroll;
+}

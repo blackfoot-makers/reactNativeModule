@@ -1,0 +1,130 @@
+# update_fastlane
+
+fastlane_version "2.59.0"
+
+default_platform :ios
+
+platform :ios do
+  desc "Add new testers devices"
+  lane :addTesters do
+    register_devices(
+      devices_file: "./fastlane/devices.txt",
+      username: "#{ENV["APPLE_ID"]}"
+    )
+    match(
+      type: "#{ENV["MATCH_EXPORT_METHOD"]}",
+      force_for_new_devices: true,
+    )
+  end
+
+  desc "Build & deploy"
+  lane :buildAndDeploy do
+    changelog = prompt(
+      text: "Changelog: ",
+      multi_line_end_keyword: "END",
+    )
+    gym(
+      scheme: "#{ENV["APP_IOS_SCHEME"]}",
+      export_method: "#{ENV["EXPORT_METHOD"]}",
+      silent: true,
+      clean: true,
+    )
+    crashlytics(
+      api_token: "#{ENV["CRASHLYTICS_TOKEN"]}",
+      build_secret: "#{ENV["CRASHLYTICS_SECRET"]}",
+      emails: "#{ENV["TESTERS_IOS"]}",
+      notifications: true,
+      notes: changelog
+    )
+    refreshDsyms
+  end
+
+  desc "Increment build number"
+  lane :incrementBuild do
+    ensure_git_status_clean
+    increment_build_number
+  end
+
+  desc "Refresh dsym on crashlytics"
+  lane :refreshDsyms do
+  upload_symbols_to_crashlytics(
+    dsym_path: "./#{ENV["APP_IOS_SCHEME"]}.app.dSYM.zip",
+    api_token: "#{ENV["CRASHLYTICS_TOKEN"]}",
+  )
+  clean_build_artifacts
+  end
+
+  desc "Push git tag"
+  lane :pushTag do
+    commit_version_bump(
+      xcodeproj: "./#{ENV["APP_IOS_PROJECT"]}", # optional, if you have multiple Xcode project files, you must specify your main project here
+    )
+    add_git_tag
+    push_to_git_remote
+  end
+
+  # desc "Submit a new Beta Build for the CI"
+  # lane :betaCI do
+  #   incrementBuild
+  #   match(readonly: true,
+  #     clone_branch_directly: true,
+  #     git_url: "#{ENV["MATCH_CI_GIT"]}",
+  #   )
+  #   buildAndDeploy
+  #   pushTag
+  # end
+
+  desc "Submit a new Beta Build manually"
+  lane :beta do
+    incrementBuild
+    match(readonly: true,
+      clone_branch_directly: true,
+      type: "#{ENV["MATCH_EXPORT_METHOD"]}",
+    )
+    buildAndDeploy
+    pushTag
+    notification(
+      title: "Finished Building",
+      message: "Uploading MyBodyCoach to Crashlytics...",
+    )
+  end
+
+  # desc "Submit a new Beta Build manually to TestFlight"
+  # lane :betaTestFlight do
+  #   # incrementBuild
+  #   match(readonly: true,
+  #     clone_branch_directly: true,
+  #     type: "#{ENV["MATCH_EXPORT_METHOD_TESTFLIGHT"]}",
+  #   )
+  #   gym(
+  #     scheme: "#{ENV["APP_IOS_SCHEME"]}",
+  #     export_method: "#{ENV["EXPORT_METHOD_TESTFLIGHT"]}",
+  #     silent: true,
+  #     clean: true,
+  #   )
+  #   pilot(skip_waiting_for_build_processing: true,
+  #     username: "#{ENV["APPLE_ID"]}",
+  #     app_identifier: "#{ENV["APP_ID"]}",
+  #   )
+  #   # pushTag
+  #   notification(
+  #     title: "Finished Building",
+  #     message: "Uploading Monimalz to Crashlytics...",
+  #   )
+  # end
+
+  # error do
+  #   slack(
+  #     channel: "#monimalz_dev",
+  #     message: "Building error for iOS",
+  #     success: false,
+  #   )
+  # end
+
+  # after_all do |lane|
+  #   slack(
+  #     channel: "#monimalz_dev",
+  #     message: "Successfully ran lane '#{lane}' for iOS!",
+  #   )
+  # end
+end
