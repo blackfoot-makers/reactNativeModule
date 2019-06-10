@@ -1,5 +1,13 @@
 {
   "expo": {
-    "sdkVersion": "26.0.0"
+    "sdkVersion": "31.0.0",
+    "name": "1pm",
+    "slug": "1pm",
+    "version": "0.1.0",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "description": ""
   }
 }
