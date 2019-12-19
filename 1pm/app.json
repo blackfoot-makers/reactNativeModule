@@ -1,13 +1,30 @@
 {
   "expo": {
-    "sdkVersion": "31.0.0",
     "name": "1pm",
-    "slug": "1pm",
-    "version": "0.1.0",
+    "slug": "new",
+    "privacy": "public",
+    "sdkVersion": "36.0.0",
     "platforms": [
+      "ios",
       "android",
-      "ios"
+      "web"
     ],
-    "description": ""
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    }
   }
 }
