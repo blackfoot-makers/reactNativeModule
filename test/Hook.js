@@ -11,6 +11,7 @@ const Hook = ({}) => {
 
 const HookState = ({}) => {
   const [count, setCount] = useState(0);
+
   const onPress = () => {
     setCount(count + 1);
   };
@@ -38,19 +39,19 @@ const HookStateCallback = ({}) => {
 const HookStateMount = ({}) => {
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [state, setState] = useState({ count: 0, loading: true });
+  // const [state, setState] = useState({ count: 0, loading: true });
 
   const onPress = useCallback(() => {
     setCount(count + 1);
-  }, [count]);
+  }, [setCount]);
 
   useEffect(() => {
     setLoading(false);
-    setState({ ...state, loading: false });
+    // setState({ ...state, loading: false });
     return () => {
       setLoading(true);
     };
-  }, [count, loading]);
+  }, [count]);
 
   return (
     <View>

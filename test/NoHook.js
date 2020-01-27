@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { View, Text, Button } from 'react-native';
-
 class NoHook extends PureComponent {
   render() {
     return (
@@ -52,10 +51,7 @@ class NoHookStateMount extends PureComponent {
   }
 
   componentDidUpdate(prevPros, prevState) {
-    if (
-      this.state.count !== prevState.count ||
-      this.state.count !== prevState.count
-    ) {
+    if (this.state.count !== prevState.count) {
       this.setState({
         loading: false,
       });
