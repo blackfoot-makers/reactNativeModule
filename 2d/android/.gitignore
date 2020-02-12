@@ -1,0 +1,6 @@
+local.properties
+.idea/caches/
+app/build
+.gradle/
+.idea/
+build/
