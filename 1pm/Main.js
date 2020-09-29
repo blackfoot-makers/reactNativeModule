@@ -39,6 +39,7 @@ export default class Main extends React.Component {
       toValue: 1,
       duration: 4000,
       easing: Easing.elastic(0.8),
+      useNativeDriver: true,
     }).start(() => console.log('animation end'));
   }
 
