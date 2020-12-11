@@ -1,3 +1,4 @@
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import {
   StyleSheet,
@@ -89,6 +90,7 @@ export default class App extends React.Component {
             );
           })}
         </ScrollView>
+        <StatusBar hidden />
       </View>
     );
   }
